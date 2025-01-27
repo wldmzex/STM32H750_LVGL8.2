@@ -1,5 +1,5 @@
 #include "wldtool_lookuptable.h"
-#include <driver_ili9341.h>
+#include <driver_genericLCD.h>
 #include <stdint.h>
 #include <wldtool_lcd_framework.h>
 // ========================== Describe ================================
@@ -8,22 +8,22 @@
 
 unsigned char wldutil_ascill[95][16];
 // ========================== Configure ================================
-void wldlcd_init() { lcd_ili9341_init(); }
+void wldlcd_init() { lcd_generic_init(); }
 void wldlcd_draw_point(uint16_t location_x, uint16_t location_y,
                        uint32_t color) {
-  lcd_ili9341_drawpoint(location_x, location_y, color);
+  lcd_generic_drawpoint(location_x, location_y, color);
 }
-void wldlcd_clearscreen(uint32_t color) { lcd_ili9341_fullscreencolor(color); }
+void wldlcd_clearscreen(uint32_t color) { lcd_generic_fullscreencolor(color); }
 void wldlcd_draw_block(uint16_t location_x_start, uint16_t location_y_start,
                        uint16_t location_x_end, uint16_t location_y_end,
                        uint32_t color) {
-  lcd_ili9341_drawblock(location_x_start, location_y_start, location_x_end,
+  lcd_generic_drawblock(location_x_start, location_y_start, location_x_end,
                         location_y_end, color);
 }
 void wldlcd_draw_image(uint16_t location_x, uint16_t location_y,
                        uint16_t image_width, uint16_t image_height,
                        uint8_t *img) {
-  lcd_ili9341_drawimage(location_x, location_y, image_width, image_height, img);
+  lcd_generic_drawimage(location_x, location_y, image_width, image_height, img);
 }
 // ========================== Configure ================================
 //
@@ -359,7 +359,7 @@ void wldlcd_draw_string_minium(uint16_t x, uint16_t y, char *string,
       }
     }
     buffer_point = wldlcd_buffer;
-    lcd_ili9341_drawimage(x + character_counter * 8, y, 8, 16, buffer_point);
+    lcd_generic_drawimage(x + character_counter * 8, y, 8, 16, buffer_point);
     character_counter++;
     string++;
   }

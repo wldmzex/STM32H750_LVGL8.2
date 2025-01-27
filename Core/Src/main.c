@@ -20,6 +20,7 @@
 #include "main.h"
 #include "adc.h"
 #include "dcmi.h"
+#include "demos/benchmark/lv_demo_benchmark.h"
 #include "dma.h"
 #include "eth.h"
 #include "gpio.h"
@@ -30,6 +31,7 @@
 #include "lv_disp.h"
 #include "lv_hal_disp.h"
 #include "lv_label.h"
+#include "lv_log.h"
 #include "lv_obj.h"
 #include "lv_obj_pos.h"
 #include "lv_switch.h"
@@ -44,7 +46,7 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-#include "driver_ili9341.h"
+#include "driver_genericLCD.h"
 #include "wldtool_str.h"
 #include <stdint.h>
 
@@ -72,11 +74,11 @@ void wld_flush_cb(lv_disp_drv_t *disp_drv, const lv_area_t *area,
   /*The most simple case (but also the slowest) to put all pixels to the screen
    *one-by-one `put_px` is just an example, it needs to implemented by you.*/
   int32_t x, y;
-  lcd_ili9341_address_set(area->x1, area->y1, area->x2, area->y2);
+  lcd_generic_address_set(area->x1, area->y1, area->x2, area->y2);
   for (y = area->y1; y <= area->y2; y++) {
     for (x = area->x1; x <= area->x2; x++) {
-      lcd_ili9341_writecolor(color_p->full);
-      // lcd_ili9341_drawpoint(x, y, color_p->full);
+      lcd_generic_writecolor(color_p->full);
+      // lcd_generic_drawpoint(x, y, color_p->full);
       color_p++;
     }
   }
@@ -96,7 +98,7 @@ void wld_flush_cb(lv_disp_drv_t *disp_drv, const lv_area_t *area,
 // int32_t x, y;
 // for (y = area->y1; y <= area->y2; y++) {
 // for (x = area->x1; x <= area->x2; x++) {
-// lcd_ili9341_drawpoint(x, y, *buf16);
+// lcd_generic_drawpoint(x, y, *buf16);
 //// wldlcd_draw_point(x, y, *buf16);
 // buf16++;
 //}
@@ -191,8 +193,8 @@ int main(void) {
   HAL_SPI_Transmit(&hspi1, &spi_idk, 1, 100);
   TIM3->CR1 |= 1;
   TIM3->DIER |= 1;
-  lcd_ili9341_init();
-  lcd_ili9341_fullscreencolor(0xffff);
+  lcd_generic_init();
+  lcd_generic_fullscreencolor(0xffff);
   lv_init();
   lv_log_register_print_cb(my_log_cb);
   static lv_disp_draw_buf_t disp_buf;
@@ -216,33 +218,35 @@ int main(void) {
   lv_disp_t *disp = lv_disp_drv_register(&disp_drv);
   lv_obj_t *screen = lv_disp_get_scr_act(disp);
   lv_scr_load(screen);
-  lv_obj_t *led = lv_led_create(screen);
-  lv_obj_set_x(led, 10);
-  lv_obj_set_y(led, 10);
-  lv_obj_set_size(led, 10, 10);
-  lv_obj_t *label = lv_label_create(screen);
-  lv_obj_set_x(label, 50);
-  lv_obj_set_y(label, 50);
-  lv_obj_set_size(label, 100, 30);
-  lv_label_set_text(label, "WTF LVGL");
-  lv_obj_t *cb = lv_checkbox_create(screen);
-  lv_obj_set_x(cb, 0);
-  lv_obj_set_y(cb, 80);
-  lv_obj_t *sw = lv_switch_create(screen);
-  lv_obj_set_x(sw, 0);
-  lv_obj_set_y(sw, 80);
-  lv_obj_add_state(sw, LV_STATE_CHECKED);
+  // lv_obj_t *led = lv_led_create(screen);
+  //  lv_obj_set_x(led, 10);
+  //  lv_obj_set_y(led, 10);
+  //  lv_obj_set_size(led, 10, 10);
+  //  lv_obj_t *label = lv_label_create(screen);
+  //  lv_obj_set_x(label, 50);
+  //  lv_obj_set_y(label, 50);
+  //  lv_obj_set_size(label, 100, 30);
+  //  lv_label_set_text(label, "WTF LVGL");
+  //  lv_obj_t *cb = lv_checkbox_create(screen);
+  //  lv_obj_set_x(cb, 0);
+  //  lv_obj_set_y(cb, 80);
+  //  lv_obj_t *sw = lv_switch_create(screen);
+  //  lv_obj_set_x(sw, 0);
+  //  lv_obj_set_y(sw, 80);
+  //  lv_obj_add_state(sw, LV_STATE_CHECKED);
 
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   int test = 0;
+  lv_demo_benchmark();
   while (1) {
-    lv_obj_add_state(sw, LV_STATE_CHECKED);
+
+    // lv_obj_add_state(sw, LV_STATE_CHECKED);
     lv_timer_handler();
-    lv_obj_clear_state(sw, LV_STATE_CHECKED);
-    lv_timer_handler();
+    // lv_obj_clear_state(sw, LV_STATE_CHECKED);
+    // lv_timer_handler();
 
     /* USER CODE END WHILE */
     // lv_log("confused1\r\n");

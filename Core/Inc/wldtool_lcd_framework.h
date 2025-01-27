@@ -1,7 +1,7 @@
 #ifndef __WLDTOOL_LCD_FRAMEWORK_H_
 #define __WLDTOOL_LCD_FRAMEWORK_H_
 #include "stdint.h"
-#include <driver_ili9341.h>
+#include <driver_genericLCD.h>
 #include <wldtool_lookuptable.h>
 // ========================== Describe ================================
 // wldlcd basic graphic render framework

@@ -211,6 +211,8 @@ clean:
 # dependencies
 #######################################
 -include $(wildcard $(BUILD_DIR)/*.d)
+
+# *** EOF ***
 download:
 	openocd -f stlink.cfg -c init -c "program build/$(TARGET).hex verify reset exit" -c exit	 
 downloadw:
@@ -219,5 +221,3 @@ downloade:
 	openocd -f esplink.cfg -c init -c "program build/$(TARGET).hex verify reset exit" -c exit	 
 reset:
 	openocd -f stlink.cfg -c init -c reset -c exit	 
-
-# *** EOF ***
