@@ -21,25 +21,19 @@
 #include "adc.h"
 #include "dcmi.h"
 #include "demos/benchmark/lv_demo_benchmark.h"
+#include "demos/widgets/lv_demo_widgets.h"
 #include "dma.h"
 #include "eth.h"
 #include "gpio.h"
 #include "i2c.h"
-#include "lv_btn.h"
-#include "lv_checkbox.h"
-#include "lv_color.h"
-#include "lv_disp.h"
-#include "lv_hal_disp.h"
-#include "lv_label.h"
-#include "lv_log.h"
-#include "lv_obj.h"
-#include "lv_obj_pos.h"
-#include "lv_switch.h"
-#include "lv_timer.h"
-#include "memorymap.h"
 #include "spi.h"
-#include "src/extra/widgets/led/lv_led.h"
+#include "src/display/lv_display.h"
+#include "src/misc/lv_timer.h"
+#include "src/misc/lv_types.h"
+#include "src/tick/lv_tick.h"
+#include "src/widgets/button/lv_button.h"
 #include "stm32h7xx_hal.h"
+#include "stm32h7xx_hal_spi.h"
 #include "stm32h7xx_hal_uart.h"
 #include "tim.h"
 #include "usart.h"
@@ -69,46 +63,27 @@ int test = 0;
 /* Private macro -------------------------------------------------------------*/
 /* USER CODE BEGIN PM */
 
-void wld_flush_cb(lv_disp_drv_t *disp_drv, const lv_area_t *area,
-                  lv_color_t *color_p) {
-  /*The most simple case (but also the slowest) to put all pixels to the screen
-   *one-by-one `put_px` is just an example, it needs to implemented by you.*/
+void static wld_flush_cb(lv_display_t *display, const lv_area_t *area,
+                         uint8_t *px_map) {
+  /* The most simple case (also the slowest) to send all rendered pixels to the
+   * screen one-by-one.  `put_px` is just an example.  It needs to be
+   * implemented by you. */
+  uint16_t *buf16 =
+      (uint16_t *)px_map; /* Let's say it's a 16 bit (RGB565) display */
   int32_t x, y;
   lcd_generic_address_set(area->x1, area->y1, area->x2, area->y2);
   for (y = area->y1; y <= area->y2; y++) {
     for (x = area->x1; x <= area->x2; x++) {
-      lcd_generic_writecolor(color_p->full);
-      // lcd_generic_drawpoint(x, y, color_p->full);
-      color_p++;
+      lcd_generic_writecolor(*buf16);
+      // wldlcd_draw_point(x, y, *buf16);
+      buf16++;
     }
   }
 
   /* IMPORTANT!!!
-   * Inform the graphics library that you are ready with the flushing*/
-  lv_disp_flush_ready(disp_drv);
+   * Inform LVGL that flushing is complete so buffer can be modified again. */
+  lv_display_flush_ready(display);
 }
-
-// void static wld_flush_cb(lv_display_t *display, const lv_area_t *area,
-// uint8_t *px_map) {
-///* The most simple case (also the slowest) to send all rendered pixels to the
-//* screen one-by-one.  `put_px` is just an example.  It needs to be
-//* implemented by you. */
-// uint16_t *buf16 =
-//(uint16_t *)px_map; /* Let's say it's a 16 bit (RGB565) display */
-// int32_t x, y;
-// for (y = area->y1; y <= area->y2; y++) {
-// for (x = area->x1; x <= area->x2; x++) {
-// lcd_generic_drawpoint(x, y, *buf16);
-//// wldlcd_draw_point(x, y, *buf16);
-// buf16++;
-//}
-//}
-//
-//
-///* IMPORTANT!!!
-//* Inform LVGL that flushing is complete so buffer can be modified again. */
-// lv_display_flush_ready(display);
-// }
 void dialog_u1_8b(char data) {
   uint16_t udelay = 0;
   while (!(USART1->ISR & 0x40)) {
@@ -195,29 +170,32 @@ int main(void) {
   TIM3->DIER |= 1;
   lcd_generic_init();
   lcd_generic_fullscreencolor(0xffff);
-  lv_init();
-  lv_log_register_print_cb(my_log_cb);
-  static lv_disp_draw_buf_t disp_buf;
+  lv_tick_set_cb(HAL_GetTick);
 
+  lv_init();
+  lv_display_t *wlddisplay = lv_display_create(320, 240);
+  lv_display_set_buffers(wlddisplay, buf_1, buf_2, BUFF_SIZE,
+                         LV_DISPLAY_RENDER_MODE_PARTIAL);
+  lv_display_set_flush_cb(wlddisplay, wld_flush_cb);
+  // lv_obj_t *button = lv_button_create(lv_screen_active());
   /*Static or global buffer(s). The second buffer is optional*/
-  static lv_color_t buf_1[320 * 10];
-  static lv_color_t buf_2[320 * 10];
 
   /*Initialize `disp_buf` with the buffer(s). With only one buffer use NULL
    * instead buf_2 */
-  lv_disp_draw_buf_init(&disp_buf, buf_1, buf_2, 320 * 10);
+  //  lv_disp_draw_buf_init(&disp_buf, buf_1, buf_2, 320 * 10);
 
-  static lv_disp_drv_t
-      disp_drv; /*A variable to hold the drivers. Must be static or global.*/
-  lv_disp_drv_init(&disp_drv);   /*Basic initialization*/
-  disp_drv.draw_buf = &disp_buf; /*Set an initialized buffer*/
-  disp_drv.flush_cb = wld_flush_cb;
-  disp_drv.hor_res = 320; /*Set the horizontal resolution in pixels*/
-  disp_drv.ver_res = 240; /*Set the vertical resolution in pixels*/
+  //  static lv_disp_drv_t
+  //      disp_drv; /*A variable to hold the drivers. Must be static or
+  //      global.*/
+  //  lv_disp_drv_init(&disp_drv);   /*Basic initialization*/
+  //  disp_drv.draw_buf = &disp_buf; /*Set an initialized buffer*/
+  //  disp_drv.flush_cb = wld_flush_cb;
+  //  disp_drv.hor_res = 320; /*Set the horizontal resolution in pixels*/
+  //  disp_drv.ver_res = 240; /*Set the vertical resolution in pixels*/
 
-  lv_disp_t *disp = lv_disp_drv_register(&disp_drv);
-  lv_obj_t *screen = lv_disp_get_scr_act(disp);
-  lv_scr_load(screen);
+  //  lv_disp_t *disp = lv_disp_drv_register(&disp_drv);
+  //  lv_obj_t *screen = lv_disp_get_scr_act(disp);
+  //  lv_scr_load(screen);
   // lv_obj_t *led = lv_led_create(screen);
   //  lv_obj_set_x(led, 10);
   //  lv_obj_set_y(led, 10);
@@ -234,17 +212,17 @@ int main(void) {
   //  lv_obj_set_x(sw, 0);
   //  lv_obj_set_y(sw, 80);
   //  lv_obj_add_state(sw, LV_STATE_CHECKED);
-
+  // lv_demo_benchmark();
+  lv_demo_widgets();
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
-  int test = 0;
-  lv_demo_benchmark();
   while (1) {
+    lv_timer_handler();
 
     // lv_obj_add_state(sw, LV_STATE_CHECKED);
-    lv_timer_handler();
+    //    lv_timer_handler();
     // lv_obj_clear_state(sw, LV_STATE_CHECKED);
     // lv_timer_handler();
 

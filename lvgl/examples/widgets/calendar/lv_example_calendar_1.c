@@ -16,13 +16,13 @@ static void event_handler(lv_event_t * e)
 
 void lv_example_calendar_1(void)
 {
-    lv_obj_t  * calendar = lv_calendar_create(lv_scr_act());
-    lv_obj_set_size(calendar, 185, 185);
+    lv_obj_t  * calendar = lv_calendar_create(lv_screen_active());
+    lv_obj_set_size(calendar, 185, 230);
     lv_obj_align(calendar, LV_ALIGN_CENTER, 0, 27);
     lv_obj_add_event_cb(calendar, event_handler, LV_EVENT_ALL, NULL);
 
     lv_calendar_set_today_date(calendar, 2021, 02, 23);
-    lv_calendar_set_showed_date(calendar, 2021, 02);
+    lv_calendar_set_month_shown(calendar, 2021, 02);
 
     /*Highlight a few days*/
     static lv_calendar_date_t highlighted_days[3];       /*Only its pointer will be saved so should be static*/
@@ -45,7 +45,6 @@ void lv_example_calendar_1(void)
 #elif LV_USE_CALENDAR_HEADER_ARROW
     lv_calendar_header_arrow_create(calendar);
 #endif
-    lv_calendar_set_showed_date(calendar, 2021, 10);
 }
 
 #endif

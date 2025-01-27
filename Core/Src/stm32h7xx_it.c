@@ -19,7 +19,7 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "stm32h7xx_it.h"
-#include "lv_hal_tick.h"
+// #include "lv_hal_tick.h"
 #include "main.h"
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
@@ -172,7 +172,7 @@ void PendSV_Handler(void) {
  */
 void SysTick_Handler(void) {
   /* USER CODE BEGIN SysTick_IRQn 0 */
-  lv_tick_inc(1);
+  //  lv_tick_inc(1);
   /* USER CODE END SysTick_IRQn 0 */
   HAL_IncTick();
   /* USER CODE BEGIN SysTick_IRQn 1 */
