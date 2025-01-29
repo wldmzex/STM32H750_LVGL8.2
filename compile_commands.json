@@ -146,14 +146,14 @@
       "-I/home/wldmzex/EmbeddedProject/stm32h750/REDMAGE_LVGL_DEMO/lvgl/src/hal",
       "-I/home/wldmzex/EmbeddedProject/stm32h750/REDMAGE_LVGL_DEMO/lvgl/src/misc",
       "-I/home/wldmzex/EmbeddedProject/stm32h750/REDMAGE_LVGL_DEMO/lvgl/src/widgets",
-      "-Wa,-a,-ad,-alms=build/driver_ili9341.lst",
+      "-Wa,-a,-ad,-alms=build/driver_genericLCD.lst",
       "-o",
-      "build/driver_ili9341.o",
-      "Core/Src/driver_ili9341.c"
+      "build/driver_genericLCD.o",
+      "Core/Src/driver_genericLCD.c"
     ],
     "directory": "/home/wldmzex/EmbeddedProject/stm32h750/REDMAGE_LVGL_DEMO",
-    "file": "/home/wldmzex/EmbeddedProject/stm32h750/REDMAGE_LVGL_DEMO/Core/Src/driver_ili9341.c",
-    "output": "/home/wldmzex/EmbeddedProject/stm32h750/REDMAGE_LVGL_DEMO/build/driver_ili9341.o"
+    "file": "/home/wldmzex/EmbeddedProject/stm32h750/REDMAGE_LVGL_DEMO/Core/Src/driver_genericLCD.c",
+    "output": "/home/wldmzex/EmbeddedProject/stm32h750/REDMAGE_LVGL_DEMO/build/driver_genericLCD.o"
   },
   {
     "arguments": [

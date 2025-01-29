@@ -39,6 +39,7 @@
 #include "memorymap.h"
 #include "spi.h"
 #include "src/extra/widgets/led/lv_led.h"
+#include "src/tick/lv_tick.h"
 #include "stm32h7xx_hal.h"
 #include "stm32h7xx_hal_uart.h"
 #include "tim.h"
@@ -77,6 +78,7 @@ void wld_flush_cb(lv_disp_drv_t *disp_drv, const lv_area_t *area,
   lcd_generic_address_set(area->x1, area->y1, area->x2, area->y2);
   for (y = area->y1; y <= area->y2; y++) {
     for (x = area->x1; x <= area->x2; x++) {
+
       lcd_generic_writecolor(color_p->full);
       // lcd_generic_drawpoint(x, y, color_p->full);
       color_p++;
